@@ -117,8 +117,9 @@ public ItemResponseDto getItemDetailsByItemId(int itemid) {
 
     try (CqlSession session = CqlSession.builder().build()) {
         String query = "SELECT itemname, itemqty FROM my_keyspace.order_details WHERE itemid = ? ALLOW FILTERING";
-        SimpleStatement statement = SimpleStatement.builder(query).addPositionalValue(itemid).build();
-        ResultSet resultSet = session.execute(statement);
+        PreparedStatement preparedStatement = session.prepare(query);
+        BoundStatement boundStatement = preparedStatement.bind(itemid);
+        ResultSet resultSet = session.execute(boundStatement);
 
         for (Row row : resultSet) {
             itemName.add(row.getString("itemname"));
